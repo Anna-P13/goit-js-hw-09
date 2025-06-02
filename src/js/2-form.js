@@ -1,37 +1,46 @@
+let formData = {
+    email: '',
+    message: ''
+  };
+  
+  const form = document.querySelector('.feedback-form');
+  const STORAGE_KEY = 'feedback-form-state';
+  
 
-const formData = {
-    email: "",
-    message: "",
-};
-
-const form = document.querySelector('.feedback-form');
-form.addEventListener('input', event => {
-    const { name, value } = event.target;
-    formData[name] = value;
-    localStorage.setItem('feedback-form-state', JSON.stringify(formData));
-});
-
-const savedData = localStorage.getItem('feedback-form-state');
-
-if (savedData) {
+  const savedData = localStorage.getItem(STORAGE_KEY);
+  if (savedData) {
     const parsedData = JSON.parse(savedData);
-    form.elements.email.value = parsedData.email || '';
-    form.elements.message.value = parsedData.message || '';
-    formData.email = parsedData.email || '';
-    formData.message = parsedData.message || '';
-}
-form.addEventListener('submit', event => {
-    event.preventDefault();
-    const { email, message } = formData;
-    if (email === " " || message === " ") {
-        alert("Fill please all fields");
-        return;
+    formData = { ...formData, ...parsedData };
+  
+    form.elements.email.value = formData.email;
+    form.elements.message.value = formData.message;
+  }
+  
+ 
+  form.addEventListener('input', (event) => {
+    const { name, value } = event.target;
+    if (name in formData) {
+      formData[name] = value;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
     }
-    console.log(formData);
+  });
 
-    localStorage.removeItem('feedback-form-state');
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+  
+    const email = form.elements.email.value.trim();
+    const message = form.elements.message.value.trim();
+  
+    if (email === '' || message === '') {
+      alert('Fill please all fields');
+      return;
+    }
+  
+    console.log({ email, message });
+  
+  
+    localStorage.removeItem(STORAGE_KEY);
+    formData = { email: '', message: '' };
     form.reset();
-    formData.email = " ";
-    formData.message = " ";
-});
-
+  });
+  
